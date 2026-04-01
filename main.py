@@ -12,23 +12,6 @@ html pages
 
 app = FastAPI()
 
-users = [
-    {
-        "name": "Adrien",
-        "age": 22,
-        "email": "adrien.letort@epfedu.frf",
-        "tel": "06 12 13 14 15",
-        "projects": [
-            {
-                "name": "RenovTaCana",
-                "date_start": "2026-03-01",
-                "image_path": "string",
-                "description": "Projet de semestre 4a epf",
-            }
-        ]
-    }
-]
-
 
 class Project(BaseModel):
     name: str
@@ -42,11 +25,31 @@ class Project(BaseModel):
 
 class User(BaseModel):
     name: str
+    firstname: str
     age: int
     email: str
     github: str | None = None
     tel: str | None = None
     projects: list[Project]
+
+
+users: list[User] = [
+    User(
+        name="Letort",
+        firstname="Adrien",
+        age=22,
+        email="adrien.letort@epfedu.frf",
+        tel="06 12 13 14 15",
+        projects=[
+            Project(
+                name="RenovTaCana",
+                date_start=date(2026, 4, 1),
+                image_path="string",
+                description="Projet de semestre 4a epf",
+            )
+        ],
+    )
+]
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -59,7 +62,10 @@ def home():
 
 @app.get("/users")
 def get_all_users():
-    return [f"ID: {index}, name: {user.name}\n" for index, user in enumerate(users)]
+    return [
+        f"ID: {index}, name: {user.name} {user.firstname}\n"
+        for index, user in enumerate(users)
+    ]
 
 
 @app.post("/add_user")
@@ -74,13 +80,15 @@ def add_project(user_id: int, project: Project):
     return {"user": users[user_id]}
 
 
-@app.get("/remove_project/{project_id}")
-def remove_project(project_id):
-    # todo
-    return {"message": "pas finie"}
+@app.post("/remove_project")
+def remove_project(user_id: int, project_id: int):
+    users[user_id].projects.pop(project_id)
+    return {
+        "message": f"removed project {project_id} from {users[user_id].firstname} {users[user_id].name}"
+    }
 
 
-@app.get("/remove_user")
-def remove_user(user: User):
-    # todo
-    return {"message": "pas finie"}
+@app.post("/remove_user/{user_id}")
+def remove_user(user_id: int):
+    users.pop(user_id)
+    return {"message": f"removed user {user_id}"}
