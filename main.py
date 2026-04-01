@@ -12,7 +12,22 @@ html pages
 
 app = FastAPI()
 
-users = []
+users = [
+    {
+        "name": "Adrien",
+        "age": 22,
+        "email": "adrien.letort@epfedu.frf",
+        "tel": "06 12 13 14 15",
+        "projects": [
+            {
+                "name": "RenovTaCana",
+                "date_start": "2026-03-01",
+                "image_path": "string",
+                "description": "Projet de semestre 4a epf",
+            }
+        ]
+    }
+]
 
 
 class Project(BaseModel):
@@ -44,7 +59,7 @@ def home():
 
 @app.get("/users")
 def get_all_users():
-    return [f"ID: {index}, name: {user.name}" for index, user in enumerate(users)]
+    return [f"ID: {index}, name: {user.name}\n" for index, user in enumerate(users)]
 
 
 @app.post("/add_user")
@@ -62,7 +77,7 @@ def add_project(user_id: int, project: Project):
 @app.get("/remove_project/{project_id}")
 def remove_project(project_id):
     # todo
-    return {"test": "test"}
+    return {"message": "pas finie"}
 
 
 @app.get("/remove_user")
