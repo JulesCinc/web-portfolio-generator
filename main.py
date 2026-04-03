@@ -1,94 +1,117 @@
 # https://github.com/EPF-MDE/fastapi-coffee-experiment/blob/master/main.py
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
 from datetime import date
+from typing import Annotated
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 """
 to do :
-add a database for users and prohect
+add a database for users and prohect    
 html pages
 """
 
-app = FastAPI()
 
-
-class Project(BaseModel):
+class Project(SQLModel, table=True):
+    project_id: int | None = Field(default=None, primary_key=True)
+    user_id: int
     name: str
     date_start: date
     date_end: date | None = None
     image_path: str | None = None
     description: str
     link: str | None = None
-    dotlist: list[str] | None = None
+    dotlist: str | None = None
 
 
-class User(BaseModel):
+class User(SQLModel, table=True):
+    user_id: int | None = Field(default=None, primary_key=True)
     name: str
     firstname: str
     age: int
     email: str
     github: str | None = None
     tel: str | None = None
-    projects: list[Project]
 
 
-users: list[User] = [
-    User(
-        name="Letort",
-        firstname="Adrien",
-        age=22,
-        email="adrien.letort@epfedu.frf",
-        tel="06 12 13 14 15",
-        projects=[
-            Project(
-                name="RenovTaCana",
-                date_start=date(2026, 4, 1),
-                image_path="string",
-                description="Projet de semestre 4a epf",
-            )
-        ],
-    )
-]
+# Create engine
+sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args)
+
+
+# Create DB
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
+app = FastAPI()
+
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 
 @app.get("/", response_class=HTMLResponse)
 def home():
-    return f"""
+    return """
     <h1> Home Page !</h1>
-    <p>users list : {users} </p>
     """
 
 
-@app.get("/users")
-def get_all_users():
-    return [
-        f"ID: {index}, name: {user.name} {user.firstname}\n"
-        for index, user in enumerate(users)
-    ]
-
-
 @app.post("/add_user")
-def add_user(user: User):
-    users.append(user)
-    return {"user_id": len(users) - 1}
+def add_user(user: User, session: SessionDep) -> User:
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
 
 
-@app.post("/add_project/{user_id}")
-def add_project(user_id: int, project: Project):
-    users[user_id].projects.append(project)
-    return {"user": users[user_id]}
+@app.post("/add_project")
+def add_project(project: Project, session: SessionDep) -> Project:
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
 
 
-@app.post("/remove_project")
-def remove_project(user_id: int, project_id: int):
-    users[user_id].projects.pop(project_id)
-    return {
-        "message": f"removed project {project_id} from {users[user_id].firstname} {users[user_id].name}"
-    }
+@app.get("/users")
+def get_all_users(session: SessionDep):
+    users = session.exec(select(User)).all()
+    return users
 
 
-@app.post("/remove_user/{user_id}")
-def remove_user(user_id: int):
-    users.pop(user_id)
-    return {"message": f"removed user {user_id}"}
+@app.get("/get_user/{user_id}")
+def get_user_by_id(user_id: int, session: SessionDep) -> User:
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+# @app.post("/remove_project")
+# def remove_project(user_id: int, project_id: int):
+#     users[user_id].projects.pop(project_id)
+#     return {
+#         "message": f"removed project {project_id} from {users[user_id].firstname} {users[user_id].name}"
+#     }
+
+
+@app.delete("/remove_user/{user_id}")
+def delete_user_by_id(user_id: int, session: SessionDep):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    session.delete(user)
+    session.commit()
+    return {"response": f"removed user {user_id}"}
