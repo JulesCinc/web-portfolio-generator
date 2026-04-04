@@ -8,8 +8,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 """
 to do :
-add a database for users and prohect    
-html pages
+add a database for users and prohect
 """
 
 
@@ -43,6 +42,7 @@ connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
 
 templates = Jinja2Templates(directory="front")
+titre = "Portfolio generator"
 
 # Create DB
 def create_db_and_tables():
@@ -64,9 +64,9 @@ def on_startup():
     create_db_and_tables()
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse(request,"home.html")
+    return templates.TemplateResponse(request,"home.html",context={"titre": titre,},)
 
 
 @app.post("/add_user")
