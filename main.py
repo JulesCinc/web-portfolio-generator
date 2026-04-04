@@ -1,6 +1,7 @@
 # https://github.com/EPF-MDE/fastapi-coffee-experiment/blob/master/main.py
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from datetime import date
 from typing import Annotated
 from sqlmodel import Field, Session, SQLModel, create_engine, select
@@ -41,6 +42,7 @@ sqlite_url = f"sqlite:///{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
 
+templates = Jinja2Templates(directory="front")
 
 # Create DB
 def create_db_and_tables():
@@ -63,10 +65,8 @@ def on_startup():
 
 
 @app.get("/", response_class=HTMLResponse)
-def home():
-    return """
-    <h1> Home Page !</h1>
-    """
+def home(request: Request):
+    return templates.TemplateResponse(request,"home.html")
 
 
 @app.post("/add_user")
