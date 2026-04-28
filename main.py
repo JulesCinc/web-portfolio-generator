@@ -65,8 +65,13 @@ def on_startup():
 
 
 @app.get("/")
-def home(request: Request):
-    return templates.TemplateResponse(request, "index.html")
+def home_page(request: Request):
+    return templates.TemplateResponse(request, "users.html")
+
+
+@app.get("/add-user")
+def add_user_page(request: Request):
+    return templates.TemplateResponse(request, "add-user.html")
 
 
 @app.post("/add_user")
