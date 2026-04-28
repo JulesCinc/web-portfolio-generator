@@ -16,8 +16,6 @@ class Project(SQLModel, table=True):
     project_id: int | None = Field(default=None, primary_key=True)
     user_id: int
     name: str
-    date_start: date
-    date_end: date | None = None
     image_path: str | None = None
     description: str
     link: str | None = None
