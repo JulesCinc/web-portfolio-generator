@@ -44,6 +44,7 @@ engine = create_engine(sqlite_url, connect_args=connect_args)
 templates = Jinja2Templates(directory="front")
 titre = "Portfolio generator"
 
+
 # Create DB
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
@@ -66,7 +67,13 @@ def on_startup():
 
 @app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse(request,"home.html",context={"titre": titre,},)
+    return templates.TemplateResponse(
+        request,
+        "home.html",
+        context={
+            "titre": titre,
+        },
+    )
 
 
 @app.post("/add_user")
@@ -99,12 +106,14 @@ def get_user_by_id(user_id: int, session: SessionDep) -> User:
     return user
 
 
-# @app.post("/remove_project")
-# def remove_project(user_id: int, project_id: int):
-#     users[user_id].projects.pop(project_id)
-#     return {
-#         "message": f"removed project {project_id} from {users[user_id].firstname} {users[user_id].name}"
-#     }
+@app.delete("/remove_project/{project_id}")
+def delete_project_by_id(project_id: int, session: SessionDep):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="User not found")
+    session.delete(project)
+    session.commit()
+    return {"response": f"removed project {project_id}"}
 
 
 @app.delete("/remove_user/{user_id}")
