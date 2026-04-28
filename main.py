@@ -41,8 +41,8 @@ sqlite_url = f"sqlite:///{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
 
-templates = Jinja2Templates(directory="front")
-titre = "Portfolio generator"
+templates = Jinja2Templates(directory="template")
+
 
 # Create DB
 def create_db_and_tables():
@@ -66,7 +66,7 @@ def on_startup():
 
 @app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse(request,"home.html",context={"titre": titre,},)
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post("/add_user")
