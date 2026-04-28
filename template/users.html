@@ -1,8 +1,3 @@
-{% extends "base.html" %}
-{%block content%}
-<h3>Users</h3>
-{%endblock%}
-
-{%block footer%}
-<a href="/add-user">Add user</a>
-{%endblock%}
+{% for user in users %}
+<li>{{user.name}} {{user.firstname}}</li>
+{%endfor%}

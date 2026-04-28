@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{%block content%}
+<h3>Users</h3>
+<ul
+  id="users"
+  hx-get="/userspage"
+  hx-swap="innerHTML"
+  hx-trigger="load"
+>
+  <li class="htmx-indicator">Loading...</li>
+</ul>
+{%endblock%}
+
+{%block footer%}
+<a href="/add-user-page">Add user</a>
+{%endblock%}

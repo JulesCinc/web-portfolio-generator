@@ -66,10 +66,20 @@ def on_startup():
 
 @app.get("/")
 def home_page(request: Request):
-    return templates.TemplateResponse(request, "users.html")
+    return templates.TemplateResponse(request, "index.html")
 
 
-@app.get("/add-user")
+@app.get("/userspage")
+def see_users_page(request: Request, session: SessionDep):
+    users = session.exec(select(User)).all()
+    return templates.TemplateResponse(
+        request=request,
+        name="users.html",
+        context={"users": users},
+    )
+
+
+@app.get("/add-user-page")
 def add_user_page(request: Request):
     return templates.TemplateResponse(request, "add-user.html")
 
