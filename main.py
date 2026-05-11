@@ -16,8 +16,6 @@ class Project(SQLModel, table=True):
     project_id: int | None = Field(default=None, primary_key=True)
     user_id: int
     name: str
-    date_start: date
-    date_end: date | None = None
     image_path: str | None = None
     description: str
     link: str | None = None
@@ -114,12 +112,14 @@ def get_user_by_id(user_id: int, session: SessionDep) -> User:
     return user
 
 
-# @app.post("/remove_project")
-# def remove_project(user_id: int, project_id: int):
-#     users[user_id].projects.pop(project_id)
-#     return {
-#         "message": f"removed project {project_id} from {users[user_id].firstname} {users[user_id].name}"
-#     }
+@app.delete("/remove_project/{project_id}")
+def delete_project_by_id(project_id: int, session: SessionDep):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="User not found")
+    session.delete(project)
+    session.commit()
+    return {"response": f"removed project {project_id}"}
 
 
 @app.delete("/remove_user/{user_id}")
