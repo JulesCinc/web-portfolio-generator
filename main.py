@@ -84,6 +84,21 @@ def add_user_page(request: Request):
     return templates.TemplateResponse(request, "add-user.html")
 
 
+@app.get("/cv/{user_id}")
+def cv_page(request: Request, user_id: int, session: SessionDep):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    projects = session.exec(select(Project).where(Project.user_id == user_id)).all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="cv.html",
+        context={"user": user, "projects": projects},
+    )
+
+
 @app.post("/add_user")
 def add_user(user: User, session: SessionDep) -> User:
     session.add(user)
