@@ -129,7 +129,7 @@ def get_user_projects(user_id: int, session: SessionDep):
 def delete_project_by_id(project_id: int, session: SessionDep):
     project = session.get(Project, project_id)
     if not project:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Project not found")
     session.delete(project)
     session.commit()
     return {"response": f"removed project {project_id}"}
@@ -150,4 +150,4 @@ def delete_user_by_id(user_id: int, session: SessionDep):
     session.delete(user)
 
     session.commit()
-    return {"response": f"removed user {user_id}"}
+    return {"response": f"removed user {user_id} and associated project(s)"}
