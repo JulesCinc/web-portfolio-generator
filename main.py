@@ -114,6 +114,17 @@ def get_user_by_id(user_id: int, session: SessionDep) -> User:
     return user
 
 
+@app.get("/get_user/{user_id}/projects")
+def get_user_projects(user_id: int, session: SessionDep):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    projects = session.exec(select(Project).where(Project.user_id == user_id)).all()
+
+    return projects
+
+
 @app.delete("/remove_project/{project_id}")
 def delete_project_by_id(project_id: int, session: SessionDep):
     project = session.get(Project, project_id)
