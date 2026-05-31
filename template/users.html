@@ -1,3 +1,28 @@
 {% for user in users %}
-<li>{{user.name}} {{user.firstname}}</li>
+<li id="user-{{user.user_id}}">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span>{{user.name}} {{user.firstname}}</span>
+    <div>
+        <!-- hx-select="nothing" ignore json response -->
+      <button 
+        hx-delete="/remove_user/{{user.user_id}}"
+        hx-confirm="Are you sure you want to delete {{user.name}} {{user.firstname}}?"
+        hx-target="closest li"
+        hx-swap="outerHTML"
+        hx-select="nothing"
+        title="Delete user"
+        style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 0 5px;"
+      >
+        ❌
+      </button>
+      <a 
+        href="/cv/{{user.user_id}}" 
+        title="View CV"
+        style="text-decoration: none; font-size: 1.2em;"
+      >
+        📄
+      </a>
+    </div>
+  </div>
+</li>
 {%endfor%}
