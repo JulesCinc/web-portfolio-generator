@@ -140,6 +140,14 @@ def delete_user_by_id(user_id: int, session: SessionDep):
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    # Delete projects
+    projects = session.exec(select(Project).where(Project.user_id == user_id)).all()
+    for project in projects:
+        session.delete(project)
+
+    # Delete user
     session.delete(user)
+
     session.commit()
     return {"response": f"removed user {user_id}"}
