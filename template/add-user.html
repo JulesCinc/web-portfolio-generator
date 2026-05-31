@@ -1,8 +1,51 @@
 {% extends "base.html" %}
 {%block content%}
-<h3>add user interface</h3>
+<h3>Add user and projects</h3>
+
+<form id="add-user-form">
+  <fieldset>
+    <legend>User information</legend>
+    <p>
+      <label for="name">Name * :</label>
+      <input type="text" id="name" name="name" required />
+    </p>
+    <p>
+      <label for="firstname">First name * :</label>
+      <input type="text" id="firstname" name="firstname" required />
+    </p>
+    <p>
+      <label for="age">Age * :</label>
+      <input type="number" id="age" name="age" required min="1" max="150" />
+    </p>
+    <p>
+      <label for="email">Email * :</label>
+      <input type="email" id="email" name="email" required />
+    </p>
+    <p>
+      <label for="github">GitHub :</label>
+      <input type="text" id="github" name="github" placeholder="https://github.com/..." />
+    </p>
+    <p>
+      <label for="tel">Phone number :</label>
+      <input type="tel" id="tel" name="tel" placeholder="+33..." />
+    </p>
+  </fieldset>
+
+  <h3>Projects</h3>
+  <div id="projects-container">
+  </div>
+  
+  <button type="button" id="add-project-btn">
+    Add project
+  </button>
+
+  <p>
+    <button type="submit">Submit information</button>
+  </p>
+</form>
 {%endblock%}
 
 {%block footer%}
-<a href="/">See users</a>
+<a href="/">See Users</a>
+<script src="/static/add-user.js"></script>
 {%endblock%}
