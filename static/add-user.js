@@ -1,15 +1,5 @@
-/**
- * Ensure script is load only once (some problems due to hmtx)
- */
+
 (function() {
-  // Check if script already loaded
-  if (window.addUserFormInitialized) {
-    return;
-  }
-  
-  // Set as initialized
-  window.addUserFormInitialized = true;
-  
   /**
    * Counter for unique ID for the projects
    */

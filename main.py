@@ -7,11 +7,6 @@ from datetime import date
 from typing import Annotated
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-"""
-to do :
-add a database for users and prohect
-"""
-
 
 class Project(SQLModel, table=True):
     project_id: int | None = Field(default=None, primary_key=True)
